@@ -25,6 +25,8 @@ datalogType LogSystemz = LogSystem;
 datalogType LogErrorz = LogError;
 datalogType LogTransactionz = LogTransaction;
 
+bool tradeOnce;
+
 //+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
@@ -101,7 +103,14 @@ void OnDeinit(const int reason)
 //+------------------------------------------------------------------+
 void OnTick()
   {
-//---   
+//-------------Test Trade----------
+   if(!tradeOnce)
+   {
+      tradeOnce = true;
+      customTrade(20,2595.97,2650.0,true);
+   }   
+//---------------------------------
+
   }
 
 
@@ -116,15 +125,19 @@ void customTrade(double Risk, double stopLossPrice, double takeProfitPrice, bool
    
    // Get account balance
    double balance = AccountInfoDouble(ACCOUNT_BALANCE);
-   
+   Print("Account balance:" ,balance);
    // Calculate risk amount
    double riskAmount = balance * (Risk / 100.0);
+   Print("risk amount in USD: ", riskAmount);
    
    // Get trading parameters
    double tickSize   = SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_SIZE);
    double tickValue  = SymbolInfoDouble(_Symbol, SYMBOL_TRADE_TICK_VALUE);
    double contractSize = SymbolInfoDouble(_Symbol, SYMBOL_TRADE_CONTRACT_SIZE);
    
+   Print("tickSize:", tickSize);
+   Print("tickValue:", tickValue);
+   Print("contractSize:", contractSize);
    // Ensure tick value is not zero
    if (tickValue == 0 || contractSize == 0)
    {
@@ -136,6 +149,9 @@ void customTrade(double Risk, double stopLossPrice, double takeProfitPrice, bool
    double askPrice = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
    double bidPrice = SymbolInfoDouble(_Symbol, SYMBOL_BID);
 
+   Print("askPrice:", askPrice);
+   Print("bidPrice:", bidPrice);
+   
    // Determine the correct entry price based on trade direction
    double entryPrice = isBuy ? askPrice : bidPrice;
 
@@ -151,10 +167,11 @@ void customTrade(double Risk, double stopLossPrice, double takeProfitPrice, bool
       return;
    }
 
+   Print("SymbolInfoDouble(_Symbol, SYMBOL_POINT)::" , SymbolInfoDouble(_Symbol, SYMBOL_POINT));
    // Calculate Stop Loss and Take Profit distances in points
    double stopLossPips = fabs(entryPrice - stopLossPrice) / SymbolInfoDouble(_Symbol, SYMBOL_POINT);
    double takeProfitPips = fabs(takeProfitPrice - entryPrice) / SymbolInfoDouble(_Symbol, SYMBOL_POINT);
-
+   Print("stop Loss Pips: " ,stopLossPips);
    // Calculate lot size based on risk amount
    double lotSize = NormalizeDouble(riskAmount / (stopLossPips * tickValue), 2);
 
