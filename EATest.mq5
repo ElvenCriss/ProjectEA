@@ -100,11 +100,55 @@ void OnDeinit(const int reason)
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
+//+------------------------------------------------------------------+
+//+------------------------------------------------------------------+
+//add support resistance detector
+//
+//+------------------------------------------------------------------+
+//| Script to detect turning points of EMA 5 and mark them          |
+//+------------------------------------------------------------------+
+//+------------------------------------------------------------------+
+//| Script to detect turning points of EMA 5 and mark them          |
+//+------------------------------------------------------------------+
 void OnTick()
-  {
+{
+   int emaPeriod = 5;
+   int totalBars = 500;  // Number of bars to check
+   double ema[];
+   datetime timeArray[];
 
+   // Retrieve EMA values
+   if(!CopyBuffer(iMA(_Symbol, PERIOD_CURRENT, emaPeriod, 0, MODE_EMA,PRICE_CLOSE), 0, 0, totalBars, ema))
+   {
+      Print("Failed to retrieve EMA values");
+      return;
+   }
 
-  }
+   // Retrieve time values
+   if(!CopyTime(_Symbol, PERIOD_CURRENT, 0, totalBars, timeArray))
+   {
+      Print("Failed to retrieve time values");
+      return;
+   }
+
+   // Check for turning points
+   for(int i = 1; i < totalBars - 1; i++)
+   {
+      double prevSlope = ema[i] - ema[i + 1];   // Previous slope
+      double currSlope = ema[i - 1] - ema[i];   // Current slope
+
+      // Detect turning points
+      if(prevSlope > 0 && currSlope < 0) // Peak (Resistance)
+      {
+         DrawArrow(timeArray[i], ema[i], "Peak", clrRed, 233);
+      }
+      else if(prevSlope < 0 && currSlope > 0) // Valley (Support)
+      {
+         DrawArrow(timeArray[i], ema[i], "Valley", clrBlue, 234);
+      }
+   }
+}
+
 
 
 
@@ -187,4 +231,19 @@ void customTrade(double Risk, double stopLossPrice, double takeProfitPrice, bool
    }
 }
 
+
 //+------------------------------------------------------------------+
+//| Function to Draw Arrows on Turning Points                        |
+//+------------------------------------------------------------------+
+void DrawArrow(datetime timeValue, double price, string name, color clr, int arrowCode)
+{
+   string objName = name + "_" + IntegerToString(timeValue);
+
+   if(ObjectFind(0, objName) == -1)
+   {
+      ObjectCreate(0, objName, OBJ_ARROW, 0, timeValue, price);
+      ObjectSetInteger(0, objName, OBJPROP_COLOR, clr);
+      ObjectSetInteger(0, objName, OBJPROP_ARROWCODE, arrowCode);
+      ObjectSetInteger(0, objName, OBJPROP_WIDTH, 2);
+   }
+}
