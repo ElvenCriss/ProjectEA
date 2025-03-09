@@ -26,6 +26,17 @@ datalogType LogErrorz = LogError;
 datalogType LogTransactionz = LogTransaction;
 
 
+
+
+// Input parameters
+input int pipThreshold = 100; // Threshold in pips to merge peaks/valleys into a single line
+
+// Global variables for tracking lines
+double lastPeakLevel = 0;
+double lastValleyLevel = 0;
+string peakLineName = "Peak_Res_Line";
+string valleyLineName = "Valley_Sup_Line";
+
 //+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
@@ -113,7 +124,7 @@ void OnDeinit(const int reason)
 void OnTick()
 {
    int emaPeriod = 5;
-   int totalBars = 500;  // Number of bars to check
+   int totalBars = 100;
    double ema[];
    datetime timeArray[];
 
@@ -131,24 +142,28 @@ void OnTick()
       return;
    }
 
-   // Check for turning points
+   // Convert pip threshold to price level difference
+   double pointValue = SymbolInfoDouble(_Symbol, SYMBOL_POINT);
+   double priceThreshold = pipThreshold * pointValue * 10; // Convert pips to price
+
+   // Loop through EMA values to detect turning points
    for(int i = 1; i < totalBars - 1; i++)
    {
       double prevSlope = ema[i] - ema[i + 1];   // Previous slope
       double currSlope = ema[i - 1] - ema[i];   // Current slope
 
-      // Detect turning points
       if(prevSlope > 0 && currSlope < 0) // Peak (Resistance)
       {
          DrawArrow(timeArray[i], ema[i], "Peak", clrRed, 233);
+         UpdateHorizontalLine(peakLineName, ema[i], lastPeakLevel, priceThreshold, clrRed);
       }
       else if(prevSlope < 0 && currSlope > 0) // Valley (Support)
       {
          DrawArrow(timeArray[i], ema[i], "Valley", clrBlue, 234);
+         UpdateHorizontalLine(valleyLineName, ema[i], lastValleyLevel, priceThreshold, clrBlue);
       }
    }
 }
-
 
 
 
@@ -245,5 +260,29 @@ void DrawArrow(datetime timeValue, double price, string name, color clr, int arr
       ObjectSetInteger(0, objName, OBJPROP_COLOR, clr);
       ObjectSetInteger(0, objName, OBJPROP_ARROWCODE, arrowCode);
       ObjectSetInteger(0, objName, OBJPROP_WIDTH, 2);
+   }
+}
+
+
+
+
+//+------------------------------------------------------------------+
+//| Function to Draw or Update Horizontal Support/Resistance Line   |
+//+------------------------------------------------------------------+
+void UpdateHorizontalLine(string lineName, double newLevel, double &lastLevel, double threshold, color lineColor)
+{
+   if(MathAbs(newLevel - lastLevel) > threshold) // If outside threshold, move the line
+   {
+      if(ObjectFind(0, lineName) != -1) // If line exists, move it
+      {
+         ObjectMove(0, lineName, 0, 0, newLevel);
+      }
+      else // If line doesn't exist, create a new one
+      {
+         ObjectCreate(0, lineName, OBJ_HLINE, 0, 0, newLevel);
+         ObjectSetInteger(0, lineName, OBJPROP_COLOR, lineColor);
+         ObjectSetInteger(0, lineName, OBJPROP_WIDTH, 2);
+      }
+      lastLevel = newLevel; // Update the last level
    }
 }
