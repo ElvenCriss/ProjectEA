@@ -34,6 +34,8 @@ input int pipThreshold = 100; // Threshold in pips to merge peaks/valleys into a
 // Global variables for tracking lines
 double lastPeakLevel = 0;
 double lastValleyLevel = 0;
+
+
 string peakLineName = "Peak_Res_Line";
 string valleyLineName = "Valley_Sup_Line";
 
@@ -125,18 +127,19 @@ void OnTick()
 {
    int emaPeriod = 5;
    int totalBars = 100;
-   double ema[];
-   datetime timeArray[];
+   
+   double ema_a[], red_b[], blue_c[], Level_d[], Horizontal_e[];
+   datetime timeArray_a[], timeArray_b[],timeArray_c[], timeArray_d[], timeArray_e[];
 
    // Retrieve EMA values
-   if(!CopyBuffer(iMA(_Symbol, PERIOD_CURRENT, emaPeriod, 0, MODE_EMA,PRICE_CLOSE), 0, 0, totalBars, ema))
+   if(!CopyBuffer(iMA(_Symbol, PERIOD_CURRENT, emaPeriod, 0, MODE_EMA,PRICE_CLOSE), 0, 0, totalBars, ema_a))
    {
       Print("Failed to retrieve EMA values");
       return;
    }
 
    // Retrieve time values
-   if(!CopyTime(_Symbol, PERIOD_CURRENT, 0, totalBars, timeArray))
+   if(!CopyTime(_Symbol, PERIOD_CURRENT, 0, totalBars, timeArray_a))
    {
       Print("Failed to retrieve time values");
       return;
@@ -146,26 +149,124 @@ void OnTick()
    double pointValue = SymbolInfoDouble(_Symbol, SYMBOL_POINT);
    double priceThreshold = pipThreshold * pointValue * 10; // Convert pips to price
 
+   
+//   for(int i = 1; i < totalBars - 1; i++)
+//   {
+//      double prevSlope = ema[i] - ema[i + 1];   // Previous slope
+//      double currSlope = ema[i - 1] - ema[i];   // Current slope
+//
+//      if(prevSlope > 0 && currSlope < 0) // Peak (Resistance)
+//      {
+//         DrawArrow(timeArray[i], ema[i], "Peak", clrRed, 233);
+//         //UpdateHorizontalLine(peakLineName, ema[i], lastPeakLevel, priceThreshold, clrRed);
+//      }
+//      else if(prevSlope < 0 && currSlope > 0) // Valley (Support)
+//      {
+//         DrawArrow(timeArray[i], ema[i], "Valley", clrBlue, 234);
+//         //UpdateHorizontalLine(valleyLineName, ema[i], lastValleyLevel, priceThreshold, clrBlue);
+//      }
+//   }
+//   
    // Loop through EMA values to detect turning points
    for(int i = 1; i < totalBars - 1; i++)
    {
-      double prevSlope = ema[i] - ema[i + 1];   // Previous slope
-      double currSlope = ema[i - 1] - ema[i];   // Current slope
+      double prevSlope = ema_a[i] - ema_a[i + 1];   // Previous slope
+      double currSlope = ema_a[i - 1] - ema_a[i];   // Current slope
 
       if(prevSlope > 0 && currSlope < 0) // Peak (Resistance)
       {
-         DrawArrow(timeArray[i], ema[i], "Peak", clrRed, 233);
-         UpdateHorizontalLine(peakLineName, ema[i], lastPeakLevel, priceThreshold, clrRed);
+         //DrawArrow(timeArray[i], ema[i], "Peak", clrRed, 233);
+         StoreInEmptySlot(red_b,ema_a[i]);
+         StoreInEmptySlot_DT(timeArray_b,timeArray_a[i]);
+         
+         StoreInEmptySlot(Level_d,ema_a[i]);
+         StoreInEmptySlot_DT(timeArray_d,timeArray_a[i]);
       }
       else if(prevSlope < 0 && currSlope > 0) // Valley (Support)
       {
-         DrawArrow(timeArray[i], ema[i], "Valley", clrBlue, 234);
-         UpdateHorizontalLine(valleyLineName, ema[i], lastValleyLevel, priceThreshold, clrBlue);
+         //DrawArrow(timeArray[i], ema[i], "Valley", clrBlue, 234);
+         StoreInEmptySlot(blue_c,ema_a[i]);
+         StoreInEmptySlot_DT(timeArray_c,timeArray_a[i]);
+         
+         StoreInEmptySlot(Level_d,ema_a[i]);
+         StoreInEmptySlot_DT(timeArray_d,timeArray_a[i]);
       }
    }
+   
+   
+   // Loop through blues and Red values to Draw turning points
+   for (int i = 1 ; i<ArraySize(red_b); i++)
+   {
+      DrawArrow(timeArray_b[i], red_b[i], "Peak", clrRed, 233);
+   }   
+   for (int i = 1 ; i<ArraySize(blue_c); i++)
+   {
+      DrawArrow(timeArray_c[i], blue_c[i], "Valley", clrBlue, 234);
+   }   
+    
+    double curr_Level = Level_d[1];
+   // Loop through Levels to Draw Horizontal Line
+   for (int i = 1 ; i<ArraySize(Level_d); i++)
+   {
+      
+   }
+
 }
 
 
+//+------------------------------------------------------------------+
+//| Custom Array Handler
+//+------------------------------------------------------------------+
+//
+void StoreInEmptySlot(double &arr[], double value) {
+   for (int i = 0; i < ArraySize(arr); i++) {
+      if (arr[i] == EMPTY_VALUE) {  // Find first empty slot
+         arr[i] = value;
+         return;
+      }
+   }
+   // If no empty slot found, resize and add at the end
+   int newSize = ArraySize(arr) + 1;
+   ArrayResize(arr, newSize);
+   arr[newSize - 1] = value;
+}
+
+
+void StoreInEmptySlot_DT(datetime &arr[], datetime value) {
+   for (int i = 0; i < ArraySize(arr); i++) {
+      if (arr[i] == EMPTY_VALUE) {  // Find first empty slot
+         arr[i] = value;
+         return;
+      }
+   }
+   // If no empty slot found, resize and add at the end
+   int newSize = ArraySize(arr) + 1;
+   ArrayResize(arr, newSize);
+   arr[newSize - 1] = value;
+}
+
+
+void RemoveAndShift(double &arr[], int index) {
+   int size = ArraySize(arr);
+   if (index < 0 || index >= size) return;
+
+   for (int i = index; i < size - 1; i++) {
+      arr[i] = arr[i + 1];  // Shift elements left
+   }
+   
+   ArrayResize(arr, size - 1);  // Reduce array size
+}
+void RemoveAndShift_DT(datetime &arr[], int index) {
+   int size = ArraySize(arr);
+   if (index < 0 || index >= size) return;
+
+   for (int i = index; i < size - 1; i++) {
+      arr[i] = arr[i + 1];  // Shift elements left
+   }
+   
+   ArrayResize(arr, size - 1);  // Reduce array size
+}
+//
 
 //+------------------------------------------------------------------+
 //| Trade execution function                                         |
