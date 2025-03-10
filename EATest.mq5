@@ -266,6 +266,32 @@ void RemoveAndShift_DT(datetime &arr[], int index) {
    
    ArrayResize(arr, size - 1);  // Reduce array size
 }
+
+// Function to insert value at a specific index
+void InsertIntoArray(double &Arr_Input[], int Index, double NewArr_Value) {
+   int currentSize = ArraySize(Arr_Input);
+   
+   // If index is out of bounds, resize the array
+   if (Index >= currentSize) {
+      ArrayResize(Arr_Input, Index + 1);
+   }
+
+   // Insert the new value at the specified index
+   Arr_Input[Index] = NewArr_Value;
+}
+//
+// Function to insert value at a specific index
+void InsertIntoArray_DT(datetime &Arr_Input[], int Index, datetime NewArr_Value) {
+   int currentSize = ArraySize(Arr_Input);
+   
+   // If index is out of bounds, resize the array
+   if (Index >= currentSize) {
+      ArrayResize(Arr_Input, Index + 1);
+   }
+
+   // Insert the new value at the specified index
+   Arr_Input[Index] = NewArr_Value;
+}
 //
 
 //+------------------------------------------------------------------+
