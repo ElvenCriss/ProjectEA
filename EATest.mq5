@@ -192,7 +192,10 @@ void OnTick()
          StoreInEmptySlot_DT(timeArray_d,timeArray_a[i]);
       }
    }
-   
+   double testArray[10] = {2012.50, 2015.75, 2020.30, 2018.60, 2025.45, 
+                           2030.10, 2028.75, 2035.20, 2040.55, 2045.80};
+                           
+   GroundSeeking_Func(testArray,Horizontal_e, 100);
    
    // Loop through blues and Red values to Draw turning points
    for (int i = 1 ; i<ArraySize(red_b); i++)
@@ -204,7 +207,7 @@ void OnTick()
       DrawArrow(timeArray_c[i], blue_c[i], "Valley", clrBlue, 234);
    }   
     
-    double curr_Level = Level_d[1];
+    //double curr_Level = Level_d[1];
    // Loop through Levels to Draw Horizontal Line
    for (int i = 1 ; i<ArraySize(Level_d); i++)
    {
@@ -413,3 +416,98 @@ void UpdateHorizontalLine(string lineName, double newLevel, double &lastLevel, d
       lastLevel = newLevel; // Update the last level
    }
 }
+
+
+double PipsDifference(double price1, double price2)
+{
+   double pipSize = SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 10; // Get pip size (for 5-digit brokers)
+   return (MathAbs(price1 - price2) / pipSize); // Absolute difference in pips
+}
+
+
+
+
+//+------------------------------------------------------------------+
+//| Function to Draw or Update Horizontal Support/Resistance Line   |
+//+------------------------------------------------------------------+
+void GroundSeeking_Func(const double &Level_Array[],double &outputArray[], int Range_InPIPs)
+{
+
+   double BufferArray[];
+   double CurrCheckingLevel;
+   double IndexArray[];
+   
+   bool LoopActivator= true;
+   int steps = 0;
+   
+   if ((ArraySize(Level_Array))== 0 ) 
+   {
+      Print("Invalid Level_Array input size");
+      return;
+   }
+   
+   // initializing
+   ArrayResize(BufferArray,ArraySize(Level_Array));
+   ArrayCopy(BufferArray,Level_Array);
+   
+   
+   while (LoopActivator)
+   { 
+      switch (steps)
+      {
+         case 0:
+            CurrCheckingLevel = BufferArray[0];
+            //Print("Step 0");
+            steps = 10;  // Move to step 1
+            break;
+         
+         case 10:
+            //Print("Step 10");
+            
+            for(int i = 0; i < ArraySize(BufferArray); i++)
+            {
+               Print(i,"test", PipsDifference(BufferArray[i],CurrCheckingLevel));
+              if(PipsDifference(BufferArray[i],CurrCheckingLevel) >= Range_InPIPs)
+              {
+               Print("Found a correct one: Index ", i );
+              }
+            }
+            
+            steps = 20;  // Move to step 2
+            break;
+         
+         case 20:
+            //Print("Step 20");
+            steps = 30;  // Move to step 3
+            break;
+         
+         case 30:
+            //Print("Step 30");
+            steps = 40;  // Move to step 3
+            break;
+            
+         case 40:
+            //Print("Step 40");
+            steps = 50;  // Move to step 3
+            break;
+            
+         case 50:
+            //Print("Step 50");
+            steps = 60;  // Move to step 3
+            break;
+            
+         case 60:
+            //Print("Step 60");
+            steps = 3;  // Move to step 3
+            LoopActivator = false; // Exit the loop
+            break;
+            
+         default:
+            Print("Unknown step");
+            LoopActivator = false; // Safety exit if something goes wrong
+            break;
+      }
+   }
+   
+}
+
