@@ -25,20 +25,8 @@ datalogType LogTransactionz = LogTransaction;
 
 
 // Input parameters
-input int pipThreshold = 400; // Threshold in pips to merge peaks/valleys into a single line
-
-// Global variables for tracking lines
-double lastPeakLevel = 0;
-double lastValleyLevel = 0;
-
-
-string peakLineName = "Peak_Res_Line";
-string valleyLineName = "Valley_Sup_Line";
-
-//+------------------------------------------------------------------+
-
-
-
+input int pipThreshold; // Threshold in pips to merge peaks/valleys into a single line
+datetime lastCandleTime = 0; // Global variable to track the last checked candle
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
@@ -57,22 +45,25 @@ void OnDeinit(const int reason)
 //---
    
   }
-//+------------------------------------------------------------------+
-//| Expert tick function                                             |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//add support resistance detector
-//
-//+------------------------------------------------------------------+
-//| Script to detect turning points of EMA 5 and mark them          |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//| Script to detect turning points of EMA 5 and mark them          |
-//+------------------------------------------------------------------+
+  
 void OnTick()
 {
-   int emaPeriod = 5;
+   datetime currentCandleTime = iTime(_Symbol, PERIOD_CURRENT, 0); // Get the current candle's open time
+
+   // Only execute when a new candle appears
+   if (currentCandleTime != lastCandleTime)
+   {
+      lastCandleTime = currentCandleTime; // Update last candle time
+      mainProg();
+   }
+
+}
+
+
+
+void mainProg()
+{
+      int emaPeriod = 5;
    int totalBars = 100;
    
    double ema_a[], red_b[], blue_c[], Level_d[], Horizontal_e[];
@@ -94,24 +85,7 @@ void OnTick()
 
    // Convert pip threshold to price level difference
    double pointValue = SymbolInfoDouble(_Symbol, SYMBOL_POINT);
-   
-//   for(int i = 1; i < totalBars - 1; i++)
-//   {
-//      double prevSlope = ema[i] - ema[i + 1];   // Previous slope
-//      double currSlope = ema[i - 1] - ema[i];   // Current slope
-//
-//      if(prevSlope > 0 && currSlope < 0) // Peak (Resistance)
-//      {
-//         DrawArrow(timeArray[i], ema[i], "Peak", clrRed, 233);
-//         //UpdateHorizontalLine(peakLineName, ema[i], lastPeakLevel, priceThreshold, clrRed);
-//      }
-//      else if(prevSlope < 0 && currSlope > 0) // Valley (Support)
-//      {
-//         DrawArrow(timeArray[i], ema[i], "Valley", clrBlue, 234);
-//         //UpdateHorizontalLine(valleyLineName, ema[i], lastValleyLevel, priceThreshold, clrBlue);
-//      }
-//   }
-//   
+
    // Loop through EMA values to detect turning points
    for(int i = 1; i < totalBars - 1; i++)
    {
@@ -120,46 +94,35 @@ void OnTick()
 
       if(prevSlope > 0 && currSlope < 0) // Peak (Resistance)
       {
-         //DrawArrow(timeArray[i], ema[i], "Peak", clrRed, 233);
          StoreInEmptySlot(red_b,ema_a[i]);
          StoreInEmptySlot_DT(timeArray_b,timeArray_a[i]);
-         
+         Print("Storing Red " + ema_a[i] + " into " );
          StoreInEmptySlot(Level_d,ema_a[i]);
          StoreInEmptySlot_DT(timeArray_d,timeArray_a[i]);
       }
       else if(prevSlope < 0 && currSlope > 0) // Valley (Support)
       {
-         //DrawArrow(timeArray[i], ema[i], "Valley", clrBlue, 234);
          StoreInEmptySlot(blue_c,ema_a[i]);
          StoreInEmptySlot_DT(timeArray_c,timeArray_a[i]);
-         
+         Print("Storing Blue " + ema_a[i] + " into " );
          StoreInEmptySlot(Level_d,ema_a[i]);
          StoreInEmptySlot_DT(timeArray_d,timeArray_a[i]);
       }
    }
-   double testArray[12] = {2012.5,2015.75,2020.3,2018.6,2025.45,2025.1,2012.75,2035.2,2040.55,2012.8,2046.7,2046.4};
-                           
-   GroundSeeking_Func(Level_d,Horizontal_e, pipThreshold);
-   
-   
-   DrawHorizontalLines(Horizontal_e);
+   ArrayPrint(Level_d);
+   ArrayPrint(red_b);
+//   double testArray[12] = {2012.5,2015.75,2020.3,2018.6,2025.45,2025.1,2012.75,2035.2,2040.55,2012.8,2046.7,2046.4};
+   Print("pipthreashold : " , pipThreshold);                        
+   GroundSeeking_Func(Level_d,timeArray_d,Horizontal_e, timeArray_e , pipThreshold);
+   DeleteAllHorizontalLines();
+   DeleteYellowIndicators();
+   // update Indicator
+   DrawHorizontalLines(Horizontal_e,timeArray_e);
    DrawArrowLinesDown(blue_c,timeArray_c);
    DrawArrowLinesUp(red_b,timeArray_b);
-   // Loop through blues and Red values to Draw turning points
-//   for (int i = 1 ; i<ArraySize(red_b); i++)
-//   {
-//      DrawArrow(timeArray_b[i], red_b[i], "Peak", clrRed, 233);
-//   }   
-//   for (int i = 1 ; i<ArraySize(blue_c); i++)
-//   {
-//      DrawArrow(timeArray_c[i], blue_c[i], "Valley", clrBlue, 234);
-//   }   
-//    
-
+      
 
 }
-
-
 
 
 

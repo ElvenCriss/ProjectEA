@@ -19,6 +19,7 @@ void StoreInEmptySlot(double &arr[], double value) {
    }
    // If no empty slot found, resize and add at the end
    int newSize = ArraySize(arr) + 1;
+   Print("expanding array Size for Value : ", value  );
    ArrayResize(arr, newSize);
    arr[newSize - 1] = value;
 }
