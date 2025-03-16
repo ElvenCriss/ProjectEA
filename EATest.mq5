@@ -144,7 +144,7 @@ void OnTick()
    
    DrawHorizontalLines(Horizontal_e);
    DrawArrowLinesDown(blue_c,timeArray_c);
-   //DrawArrowLinesUp(red_b,timeArray_b);
+   DrawArrowLinesUp(red_b,timeArray_b);
    // Loop through blues and Red values to Draw turning points
 //   for (int i = 1 ; i<ArraySize(red_b); i++)
 //   {
