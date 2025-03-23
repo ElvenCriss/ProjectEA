@@ -63,7 +63,7 @@ void OnTick()
 
 void mainProg()
 {
-      int emaPeriod = 5;
+   int emaPeriod = 5;
    int totalBars = 100;
    
    double ema_a[], red_b[], blue_c[], Level_d[], Horizontal_e[];
@@ -113,7 +113,7 @@ void mainProg()
    ArrayPrint(red_b);
 //   double testArray[12] = {2012.5,2015.75,2020.3,2018.6,2025.45,2025.1,2012.75,2035.2,2040.55,2012.8,2046.7,2046.4};
    Print("pipthreashold : " , pipThreshold);                        
-   GroundSeeking_Func(Level_d,timeArray_d,Horizontal_e, timeArray_e , pipThreshold);
+   GroundSeeking_Func(Level_d,timeArray_d,Horizontal_e, timeArray_e , pipThreshold );
    DeleteAllHorizontalLines();
    DeleteYellowIndicators();
    // update Indicator

@@ -10,6 +10,14 @@
 //| Custom Array Handler
 //+------------------------------------------------------------------+
 //
+
+// Define a struct to store both time and price together
+struct PriceTime {
+   datetime time;
+   double price;
+};
+
+
 void StoreInEmptySlot(double &arr[], double value) {
    for (int i = 0; i < ArraySize(arr); i++) {
       if (arr[i] == EMPTY_VALUE) {  // Find first empty slot
@@ -72,6 +80,18 @@ void RemoveAndShift_DT(datetime &arr[], int index) {
    
    ArrayResize(arr, size - 1);  // Reduce array size
 }
+
+void PT_RemoveAndShift(PriceTime &arr[], int index) {
+   int size = ArraySize(arr);
+   if (index < 0 || index >= size) return;
+
+   for (int i = index; i < size - 1; i++) {
+      arr[i] = arr[i + 1];  // Shift elements left
+   }
+   
+   ArrayResize(arr, size - 1);  // Reduce array size
+}
+
 
 // Function to insert value at a specific index
 void InsertIntoArray(double &Arr_Input[], int Index, double NewArr_Value) {
