@@ -90,17 +90,31 @@ bool DetectCandlestickPattern(string symbol, ENUM_TIMEFRAMES timeframe, int shif
     double close_prev2 = iClose(symbol, timeframe, shift + 2);
     double high_prev2  = iHigh(symbol, timeframe, shift + 2);
     double low_prev2   = iLow(symbol, timeframe, shift + 2);
+ 
+    double body_prev = MathAbs(open_prev - close_prev); // Body size of previous candle
+    double body_current = MathAbs(open_current - close_current); // Body size of current candle
+    double range_prev = high_prev - low_prev; // High-Low range of previous candle
+
+    bool currentCandleBigEnough = (body_current > body_prev * 1.5);
+    
+    // Define a minimum size requirement (e.g., previous candle should be at least 30% of its range)
+    bool prevCandleValid = (body_prev >= range_prev * 0.3);  
 
     // Define pattern conditions
     bool isBullishEngulfing = (close_current > open_current) &&  
                               (close_prev < open_prev) &&       
                               (close_current > open_prev) &&    
-                              (open_current < close_prev);
+                              (open_current < close_prev) &&
+                              prevCandleValid &&                 // Ensure the first candle is not too small
+                              currentCandleBigEnough;            // Ensure the engulfing candle is large enough
     
     bool isBearishEngulfing = (close_current < open_current) &&  
                               (close_prev > open_prev) &&       
                               (close_current < open_prev) &&    
-                              (open_current > close_prev);
+                              (open_current > close_prev) && 
+                              prevCandleValid &&                 // Ensure the first candle is not too small
+                              currentCandleBigEnough;            // Ensure the engulfing candle is large enough
+    
 
     bool isDoji = (MathAbs(open_prev - close_prev) <= (high_prev - low_prev) * 0.1); 
 
