@@ -13,6 +13,7 @@
  #include "CustomArrayHandler.mq5";
  #include "CustomIndicatorHandler.mq5";
  #include "CustomTradeHandler.mq5";
+ #include "CustomCS_Seeker.mq5";
 //+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
 //| Global declaration |
@@ -26,6 +27,7 @@ datalogType LogTransactionz = LogTransaction;
 
 // Input parameters
 input int pipThreshold; // Threshold in pips to merge peaks/valleys into a single line
+input int  totalBars = 100;
 datetime lastCandleTime = 0; // Global variable to track the last checked candle
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -33,7 +35,18 @@ datetime lastCandleTime = 0; // Global variable to track the last checked candle
 int OnInit()
   {
 //---
-   
+    string templateName = "standard_Temp.tpl";  // Name of your template
+   long chartID = ChartID();  // Get the current chart ID
+
+   // Apply the template
+   if (!ChartApplyTemplate(chartID, templateName))
+   {
+      Print("Failed to apply template: ", templateName);
+   }
+   else
+   {
+      Print("Template applied successfully: ", templateName);
+   }
 //---
    return(INIT_SUCCEEDED);
   }
@@ -64,7 +77,6 @@ void OnTick()
 void mainProg()
 {
    int emaPeriod = 5;
-   int totalBars = 100;
    
    double ema_a[], red_b[], blue_c[], Level_d[], Horizontal_e[];
    datetime timeArray_a[], timeArray_b[],timeArray_c[], timeArray_d[], timeArray_e[];
@@ -114,6 +126,15 @@ void mainProg()
 //   double testArray[12] = {2012.5,2015.75,2020.3,2018.6,2025.45,2025.1,2012.75,2035.2,2040.55,2012.8,2046.7,2046.4};
    Print("pipthreashold : " , pipThreshold);                        
    GroundSeeking_Func(Level_d,timeArray_d,Horizontal_e, timeArray_e , pipThreshold );
+    int srCount = ArraySize(Level_d);
+    
+    bool foundPattern = DetectCandlestickPattern(Symbol(), (ENUM_TIMEFRAMES)Period(), 1, Level_d, srCount);
+    if (foundPattern)
+    {
+        Print("Candlestick pattern found near S/R level!");
+    }
+   
+   
    DeleteAllHorizontalLines();
    DeleteYellowIndicators();
    // update Indicator
