@@ -91,7 +91,10 @@ bool DetectCandlestickPattern(string symbol, ENUM_TIMEFRAMES timeframe, int shif
     double high_prev2  = iHigh(symbol, timeframe, shift + 2);
     double low_prev2   = iLow(symbol, timeframe, shift + 2);
  
-    double body_prev = MathAbs(open_prev - close_prev); // Body size of previous candle
+     // Define body sizes
+    double body_prev2 = MathAbs(open_prev2 - close_prev2); // First candle body
+    double body_prev = MathAbs(open_prev - close_prev); // Middle candle body
+ 
     double body_current = MathAbs(open_current - close_current); // Body size of current candle
     double range_prev = high_prev - low_prev; // High-Low range of previous candle
 
@@ -118,15 +121,21 @@ bool DetectCandlestickPattern(string symbol, ENUM_TIMEFRAMES timeframe, int shif
 
     bool isDoji = (MathAbs(open_prev - close_prev) <= (high_prev - low_prev) * 0.1); 
 
-    bool isMorningStar = (close_prev2 < open_prev2) &&  
-                         isDoji &&                     
-                         (close_current > open_current) && 
-                         (close_current > (open_prev2 + close_prev2) / 2);
+    // Improved Morning Star (Bullish Reversal)
+    bool isMorningStar = (close_prev2 < open_prev2) &&  // First candle is bearish
+                         (body_prev2 > range_prev * 0.6) && // Strong first candle (big body)
+                         (body_prev < range_prev * 0.4) && // Second candle has a small body
+                         (close_current > open_current) && // Third candle is bullish
+                         (body_current > range_prev * 0.6) && // Third candle has a big body
+                         (close_current > (open_prev2 + close_prev2) / 2); // Closes above midpoint of first candle
 
-    bool isEveningStar = (close_prev2 > open_prev2) &&  
-                         isDoji &&                     
-                         (close_current < open_current) && 
-                         (close_current < (open_prev2 + close_prev2) / 2);
+    // Improved Evening Star (Bearish Reversal)
+    bool isEveningStar = (close_prev2 > open_prev2) &&  // First candle is bullish
+                         (body_prev2 > range_prev * 0.6) && // Strong first candle (big body)
+                         (body_prev < range_prev * 0.4) && // Second candle has a small body
+                         (close_current < open_current) && // Third candle is bearish
+                         (body_current > range_prev * 0.6) && // Third candle has a big body
+                         (close_current < (open_prev2 + close_prev2) / 2); // Closes below midpoint of first candle
 
     // Check if price is near a support/resistance level
     double tolerance = 5 * _Point; // Define a tolerance level
@@ -150,19 +159,23 @@ bool DetectCandlestickPattern(string symbol, ENUM_TIMEFRAMES timeframe, int shif
             double high_box = MathMax(MathMax(high_current, high_prev), high_prev2); // Highest high
             double low_box = MathMin(MathMin(low_current, low_prev), low_prev2); // Lowest low
 
-            // Create a rectangle to highlight the pattern
-            string objName = "PatternBox_" + patternName + "_" + IntegerToString(shift);
+            // Unique object name for each pattern
+            string objName = "PatternBox_" + patternName + "_" + IntegerToString(time_start);
+
+            
             ObjectCreate(0, objName, OBJ_RECTANGLE, 0, time_start, high_box, time_end, low_box);
             
+            // Check if the object already exists, if not, create it
             
-            if (isBullishEngulfing)      ObjectSetInteger(0, objName, OBJPROP_COLOR, clrLightGreen); // Box color
-            else if (isBearishEngulfing) ObjectSetInteger(0, objName, OBJPROP_COLOR, clrPink); // Box color
-            else if (isMorningStar)      ObjectSetInteger(0, objName, OBJPROP_COLOR, clrGreen); // Box color
-            else if (isEveningStar)      ObjectSetInteger(0, objName, OBJPROP_COLOR, clrCrimson); // Box color
-            ObjectSetInteger(0, objName, OBJPROP_WIDTH, 2); // Box border thickness
-            ObjectSetInteger(0, objName, OBJPROP_RAY_RIGHT, false); // Do not extend
+               if (isBullishEngulfing)      ObjectSetInteger(0, objName, OBJPROP_COLOR, clrLightGreen); // Box color
+               else if (isBearishEngulfing) ObjectSetInteger(0, objName, OBJPROP_COLOR, clrPink); // Box color
+               else if (isMorningStar)      ObjectSetInteger(0, objName, OBJPROP_COLOR, clrGreen); // Box color
+               else if (isEveningStar)      ObjectSetInteger(0, objName, OBJPROP_COLOR, clrCrimson); // Box color
+               ObjectSetInteger(0, objName, OBJPROP_WIDTH, 2); // Box border thickness
+               ObjectSetInteger(0, objName, OBJPROP_RAY_RIGHT, false); // Do not extend
 
-            Print("Detected ", patternName, " at level ", srLevel);
+               Print("Detected ", patternName, " at level ", srLevel);
+            
             return true;
         }
     }

@@ -78,11 +78,17 @@ void mainProg()
 {
    int emaPeriod = 5;
    
-   double ema_a[], red_b[], blue_c[], Level_d[], Horizontal_e[];
+   double ema_a[], red_b[], blue_c[], Level_d[], Horizontal_e[], emaTest[];
    datetime timeArray_a[], timeArray_b[],timeArray_c[], timeArray_d[], timeArray_e[];
 
    // Retrieve EMA values
    if(!CopyBuffer(iMA(_Symbol, PERIOD_CURRENT, emaPeriod, 0, MODE_EMA,PRICE_CLOSE), 0, 0, totalBars, ema_a))
+   {
+      Print("Failed to retrieve EMA values");
+      return;
+   }
+
+   if(!CopyBuffer(iMA(_Symbol, PERIOD_CURRENT, emaPeriod, 0, MODE_EMA,PRICE_CLOSE), 0, 0, totalBars, emaTest))
    {
       Print("Failed to retrieve EMA values");
       return;
@@ -137,8 +143,10 @@ void mainProg()
    
    DeleteAllHorizontalLines();
    DeleteYellowIndicators();
-   // update Indicator
-   DrawHorizontalLines(Horizontal_e,timeArray_e);
+   // update Indicator'
+   
+   Print("Current EMA outside:", emaTest[ArraySize(emaTest) - 1]);
+   DrawHorizontalLines(Horizontal_e,timeArray_e ,emaTest[ArraySize(emaTest) - 1]);
    DrawArrowLinesDown(blue_c,timeArray_c);
    DrawArrowLinesUp(red_b,timeArray_b);
       
