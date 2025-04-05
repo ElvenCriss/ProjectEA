@@ -127,26 +127,39 @@ void mainProg()
          StoreInEmptySlot_DT(timeArray_d,timeArray_a[i]);
       }
    }
-   ArrayPrint(Level_d);
-   ArrayPrint(red_b);
-//   double testArray[12] = {2012.5,2015.75,2020.3,2018.6,2025.45,2025.1,2012.75,2035.2,2040.55,2012.8,2046.7,2046.4};
-   Print("pipthreashold : " , pipThreshold);                        
-   GroundSeeking_Func(Level_d,timeArray_d,Horizontal_e, timeArray_e , pipThreshold );
-    int srCount = ArraySize(Level_d);
+//  double testArray[12] = {2012.5,2015.75,2020.3,2018.6,2025.45,2025.1,2012.75,2035.2,2040.55,2012.8,2046.7,2046.4};
+    Print("pipthreashold : " , pipThreshold);                        
+    GroundSeeking_Func(Level_d,timeArray_d,Horizontal_e, timeArray_e , pipThreshold );
     
-    bool foundPattern = DetectCandlestickPattern(Symbol(), (ENUM_TIMEFRAMES)Period(), 1, Level_d, srCount);
-    if (foundPattern)
-    {
-        Print("Candlestick pattern found near S/R level!");
-    }
+  
    
    
    DeleteAllHorizontalLines();
    DeleteYellowIndicators();
    // update Indicator'
    
-   Print("Current EMA outside:", emaTest[ArraySize(emaTest) - 1]);
-   DrawHorizontalLines(Horizontal_e,timeArray_e ,emaTest[ArraySize(emaTest) - 1]);
+   
+   
+   
+    double HighestPriceLevel;
+    double LowestPriceLevel;
+    double SupportLevel;
+    double ResistanceLevel;
+    bool CandleStick_IsBuy;
+    CSPatternType CSPattern_return;
+    bool foundPattern = DetectCandlestickPattern(Symbol(), (ENUM_TIMEFRAMES)Period(), 1, Level_d, HighestPriceLevel, LowestPriceLevel, CandleStick_IsBuy,CSPattern_return );
+    if (foundPattern)
+    {
+        Print("Candlestick pattern found. Highest :" ,HighestPriceLevel , "Lowest : ", LowestPriceLevel);
+    }
+    
+   DrawHorizontalLines(Horizontal_e,timeArray_e ,ema_a[ArraySize(ema_a) - 1], ResistanceLevel, SupportLevel);
+   if(foundPattern)
+   {
+        CustomTradeExec_Checker(SupportLevel,ResistanceLevel,CandleStick_IsBuy,HighestPriceLevel,LowestPriceLevel,CSPattern_return);
+   }
+   
+   
    DrawArrowLinesDown(blue_c,timeArray_c);
    DrawArrowLinesUp(red_b,timeArray_b);
       

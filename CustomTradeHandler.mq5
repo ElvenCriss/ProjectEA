@@ -11,6 +11,7 @@
 //| Trade execution function                                         |
 //+------------------------------------------------------------------+
 
+ #include "CustomCS_Seeker.mq5";
 
 void customTrade(double Risk, double stopLossPrice, double takeProfitPrice, bool isBuy)
 {
@@ -84,4 +85,62 @@ void customTrade(double Risk, double stopLossPrice, double takeProfitPrice, bool
    {
       trade.Sell(lotSize, _Symbol, entryPrice, stopLossPrice, takeProfitPrice, "Risk-based Sell trade with SL/TP");
    }
+}
+
+
+int CustomTradeExec_Checker(double Support, double Resistance, bool Candlestick_isBuy, double CSPattern_High, double CSPattern_Low, CSPatternType &CSPattern)
+{  
+   double ask = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+   Print("Support : ", Support, "Resistance : " , Resistance , " CSPattern_High :  " , CSPattern_High, " CSPattern_Low : " , CSPattern_Low  );
+   bool isBuy =  Candlestick_isBuy ? true : false;
+   if (isBuy)
+   {
+      if (!(CSPattern_High >= Support && Support >= CSPattern_Low )) 
+      {  
+         Print(" buy Failed to achieve");
+         return -1;
+      }
+      
+   }
+   else 
+   {
+      if (!(CSPattern_High >= Resistance && Resistance >= CSPattern_Low )) 
+      
+      {
+         Print(" sell Failed to achieve");   
+         return -1;
+      }
+   }
+   
+   Print("Checking Pattern:....");
+   if(CSPattern == BullishEngulfing_B) 
+   { 
+      double stoploss = CSPattern_Low + 100 *_Point;
+      double takeProfit = Resistance;
+      customTrade(3, stoploss ,Resistance, isBuy);
+      Print("BullishEngulfing BUY Trade at Price at : ", ask, "S/L : " , stoploss , " T/P : ", Resistance );
+   }
+   else if(CSPattern == BeareshEngulfing_S)
+   {
+      double stoploss = CSPattern_High + 100 *_Point;
+      double takeProfit = Support;
+      customTrade(3, stoploss ,Support, isBuy);
+      Print("BearishEngulfing SELL Trade at Price : ", ask, "S/L : " , stoploss , " T/P : ", Support );
+   }
+    
+   else if(CSPattern == MorningStar_B)
+   {
+      double stoploss = CSPattern_Low + 100 *_Point;
+      double takeProfit = Resistance;
+      customTrade(0.3, stoploss ,Resistance, isBuy);
+      Print("MorningStart Trade at Price : ", ask, "S/L : " , stoploss , " T/P : ", Resistance );
+   }
+   else if(CSPattern == EveningStar_S)
+   {
+      double stoploss = CSPattern_High + 100 *_Point;
+      double takeProfit = Support;
+      customTrade(0.3, stoploss ,Support, isBuy);
+      Print("EveningStar Trade at Price : ", ask, "S/L : " , stoploss , " T/P : ", Support  );
+   }
+   return 0;
 }
