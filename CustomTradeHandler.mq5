@@ -115,32 +115,72 @@ int CustomTradeExec_Checker(double Support, double Resistance, bool Candlestick_
    Print("Checking Pattern:....");
    if(CSPattern == BullishEngulfing_B) 
    { 
+   
+      double askprice; 
+      SymbolInfoDouble(_Symbol, SYMBOL_ASK, askprice);
       double stoploss = CSPattern_Low + 100 *_Point;
-      double takeProfit = Resistance;
-      customTrade(3, stoploss ,Resistance, isBuy);
+      double takeProfit = CalculateTakeProfitFromPrice(askprice,stoploss , 2, isBuy);
+      customTrade(3, stoploss ,takeProfit, isBuy);
       Print("BullishEngulfing BUY Trade at Price at : ", ask, "S/L : " , stoploss , " T/P : ", Resistance );
    }
    else if(CSPattern == BeareshEngulfing_S)
    {
+      double bidprice; 
+      SymbolInfoDouble(_Symbol, SYMBOL_BID, bidprice);
       double stoploss = CSPattern_High + 100 *_Point;
-      double takeProfit = Support;
-      customTrade(3, stoploss ,Support, isBuy);
+      double takeProfit = CalculateTakeProfitFromPrice(bidprice,stoploss , 2, isBuy);
+      customTrade(3, stoploss ,takeProfit, isBuy);
       Print("BearishEngulfing SELL Trade at Price : ", ask, "S/L : " , stoploss , " T/P : ", Support );
    }
     
    else if(CSPattern == MorningStar_B)
-   {
+   {  
+      double askprice;
+      SymbolInfoDouble(_Symbol, SYMBOL_ASK, askprice);
       double stoploss = CSPattern_Low + 100 *_Point;
-      double takeProfit = Resistance;
-      customTrade(0.3, stoploss ,Resistance, isBuy);
+      double takeProfit = CalculateTakeProfitFromPrice(askprice,stoploss , 2, isBuy);
+      customTrade(3, stoploss ,takeProfit, isBuy);
       Print("MorningStart Trade at Price : ", ask, "S/L : " , stoploss , " T/P : ", Resistance );
    }
    else if(CSPattern == EveningStar_S)
-   {
+   {  
+      double bidprice;
+      SymbolInfoDouble(_Symbol, SYMBOL_BID, bidprice);
       double stoploss = CSPattern_High + 100 *_Point;
-      double takeProfit = Support;
-      customTrade(0.3, stoploss ,Support, isBuy);
+      double takeProfit = CalculateTakeProfitFromPrice(bidprice,stoploss , 2, isBuy);
+      customTrade(3, stoploss ,takeProfit, isBuy);
       Print("EveningStar Trade at Price : ", ask, "S/L : " , stoploss , " T/P : ", Support  );
    }
    return 0;
+}
+
+
+
+
+//+------------------------------------------------------------------+
+//| Calculates Take Profit price based on price-level SL            |
+//| Inputs:                                                          |
+//|   double entryPrice  - Entry price (Ask for buy, Bid for sell)   |
+//|   double slPrice     - Stop Loss price level                     |
+//|   double rrRatio     - Risk-to-Reward ratio                      |
+//|   bool isBuy         - true for Buy, false for Sell              |
+//| Returns:                                                        |
+//|   double - Take Profit price                                     |
+//+------------------------------------------------------------------+
+double CalculateTakeProfitFromPrice(double entryPrice, double slPrice, double rrRatio, bool isBuy)
+{
+    double priceDiff, tpPrice;
+
+    if (isBuy)
+    {
+        priceDiff = entryPrice - slPrice; // risk in price
+        tpPrice = entryPrice + (priceDiff * rrRatio);
+    }
+    else
+    {
+        priceDiff = slPrice - entryPrice; // risk in price
+        tpPrice = entryPrice - (priceDiff * rrRatio);
+    }
+
+    return tpPrice;
 }
