@@ -74,7 +74,8 @@ bool DetectCandlestickPattern(string symbol, ENUM_TIMEFRAMES timeframe, int shif
                          (body_prev < range_prev * 0.4) && // Second candle has a small body
                          (close_current > open_current) && // Third candle is bullish
                          (body_current > range_prev * 0.6) && // Third candle has a big body
-                         (close_current > (open_prev2 + close_prev2) / 2); // Closes above midpoint of first candle
+                         (close_current > (open_prev2 + close_prev2) / 2) && // Closes above midpoint of first candle
+                         !(body_prev2 *1.2 <= body_current);                // Limit first candle size
 
     // Improved Evening Star (Bearish Reversal)
     bool isEveningStar = (close_prev2 > open_prev2) &&  // First candle is bullish
@@ -82,8 +83,8 @@ bool DetectCandlestickPattern(string symbol, ENUM_TIMEFRAMES timeframe, int shif
                          (body_prev < range_prev * 0.4) && // Second candle has a small body
                          (close_current < open_current) && // Third candle is bearish
                          (body_current > range_prev * 0.6) && // Third candle has a big body
-                         (close_current < (open_prev2 + close_prev2) / 2); // Closes below midpoint of first candle
-
+                         (close_current < (open_prev2 + close_prev2) / 2)&& // Closes below midpoint of first candle
+                         !(body_prev2*1.2 <= body_current);                // Limit first candle size
     // Check if price is near a support/resistance level
     double tolerance = 5 * _Point; // Define a tolerance level
     for (int i = 0; i < srCount; i++)

@@ -159,7 +159,7 @@ void mainProg()
         CustomTradeExec_Checker(SupportLevel,ResistanceLevel,CandleStick_IsBuy,HighestPriceLevel,LowestPriceLevel,CSPattern_return);
    }
    
-   
+   //MoveStopToBreakeven();
    DrawArrowLinesDown(blue_c,timeArray_c);
    DrawArrowLinesUp(red_b,timeArray_b);
       
