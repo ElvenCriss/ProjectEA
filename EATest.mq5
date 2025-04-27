@@ -28,6 +28,10 @@ datalogType LogTransactionz = LogTransaction;
 // Input parameters
 input int pipThreshold; // Threshold in pips to merge peaks/valleys into a single line
 input int  totalBars = 100;
+input int RiskPercentage;
+input int RiskRewardRatio;
+input int CushionStopLoss;
+
 datetime lastCandleTime = 0; // Global variable to track the last checked candle
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |

@@ -125,8 +125,8 @@ int CustomTradeExec_Checker(double Support, double Resistance, bool Candlestick_
       double askprice; 
       SymbolInfoDouble(_Symbol, SYMBOL_ASK, askprice);
       double stoploss = CSPattern_Low - 100 *_Point;
-      double takeProfit = CalculateTakeProfitFromPrice(askprice,stoploss , 2, isBuy);
-      customTrade(3, stoploss ,takeProfit, isBuy, CSPattern);
+      double takeProfit = CalculateTakeProfitFromPrice(askprice,stoploss , RiskRewardRatio, isBuy);
+      customTrade(RiskPercentage, stoploss ,takeProfit, isBuy, CSPattern);
       Print("BullishEngulfing BUY Trade at Price at : ", ask, "S/L : " , stoploss , " T/P : ", Resistance );
    }
    else if(CSPattern == BeareshEngulfing_S)
@@ -134,8 +134,8 @@ int CustomTradeExec_Checker(double Support, double Resistance, bool Candlestick_
       double bidprice; 
       SymbolInfoDouble(_Symbol, SYMBOL_BID, bidprice);
       double stoploss = CSPattern_High + 100 *_Point;
-      double takeProfit = CalculateTakeProfitFromPrice(bidprice,stoploss , 2, isBuy);
-      customTrade(3, stoploss ,takeProfit, isBuy, CSPattern);
+      double takeProfit = CalculateTakeProfitFromPrice(bidprice,stoploss , RiskRewardRatio, isBuy);
+      customTrade(RiskPercentage, stoploss ,takeProfit, isBuy, CSPattern);
       Print("BearishEngulfing SELL Trade at Price : ", ask, "S/L : " , stoploss , " T/P : ", Support );
    }
     
@@ -144,8 +144,8 @@ int CustomTradeExec_Checker(double Support, double Resistance, bool Candlestick_
       double askprice;
       SymbolInfoDouble(_Symbol, SYMBOL_ASK, askprice);
       double stoploss = CSPattern_Low - 100 *_Point;
-      double takeProfit = CalculateTakeProfitFromPrice(askprice,stoploss , 2, isBuy);
-      customTrade(3, stoploss ,takeProfit, isBuy, CSPattern);
+      double takeProfit = CalculateTakeProfitFromPrice(askprice,stoploss , RiskRewardRatio, isBuy);
+      customTrade(RiskPercentage, stoploss ,takeProfit, isBuy, CSPattern);
       Print("MorningStart Trade at Price : ", ask, "S/L : " , stoploss , " T/P : ", Resistance );
    }
    else if(CSPattern == EveningStar_S)
@@ -153,8 +153,8 @@ int CustomTradeExec_Checker(double Support, double Resistance, bool Candlestick_
       double bidprice;
       SymbolInfoDouble(_Symbol, SYMBOL_BID, bidprice);
       double stoploss = CSPattern_High + 100 *_Point;
-      double takeProfit = CalculateTakeProfitFromPrice(bidprice,stoploss , 2, isBuy);
-      customTrade(3, stoploss ,takeProfit, isBuy, CSPattern);
+      double takeProfit = CalculateTakeProfitFromPrice(bidprice,stoploss , RiskRewardRatio, isBuy);
+      customTrade(RiskPercentage, stoploss ,takeProfit, isBuy, CSPattern);
       Print("EveningStar Trade at Price : ", ask, "S/L : " , stoploss , " T/P : ", Support  );
    }
    return 0;
