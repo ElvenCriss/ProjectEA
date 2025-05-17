@@ -31,6 +31,9 @@ input int RiskRewardRatio;
 input int CushionStopLoss;
 
 
+input int RiskPercentage_LT;
+input int RiskRewardRation_LT;
+
 datetime lastCandleTime = 0; // Global variable to track the last checked candle
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -165,6 +168,7 @@ void mainProg()
    
    CleanupClosedTrades();
    ApplyTrailingStops();  
+   
    DrawArrowLinesDown(blue_c,timeArray_c);
    DrawArrowLinesUp(red_b,timeArray_b);
       
