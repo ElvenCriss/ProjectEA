@@ -48,7 +48,7 @@ bool DetectCandlestickPattern(string symbol, ENUM_TIMEFRAMES timeframe, int shif
     bool currentCandleBigEnough = (body_current > body_prev * 1.5);
     
     // Define a minimum size requirement (e.g., previous candle should be at least 30% of its range)
-    bool prevCandleValid = (body_prev >= range_prev * 0.3);  
+    bool prevCandleValid = true; //(body_prev >= range_prev * 0.3);  
 
     // Define pattern conditions
     bool isBullishEngulfing = (close_current > open_current) &&  
