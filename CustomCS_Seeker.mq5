@@ -122,8 +122,6 @@ bool DetectCandlestickPattern(string symbol, ENUM_TIMEFRAMES timeframe, int shif
                else if (isEveningStar)      ObjectSetInteger(0, objName, OBJPROP_COLOR, clrCrimson); // Box color
                ObjectSetInteger(0, objName, OBJPROP_WIDTH, 2); // Box border thickness
                ObjectSetInteger(0, objName, OBJPROP_RAY_RIGHT, false); // Do not extend
-
-               Print("Detected ", patternName, " at level ", srLevel);
             
             return true;
         }

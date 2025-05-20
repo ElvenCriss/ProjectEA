@@ -103,7 +103,6 @@ void mainProg()
    // Retrieve time values
    if(!CopyTime(_Symbol, PERIOD_CURRENT, 0, totalBars, timeArray_a))
    {
-      Print("Failed to retrieve time values");
       return;
    }
 
@@ -120,7 +119,7 @@ void mainProg()
       {
          StoreInEmptySlot(red_b,ema_a[i]);
          StoreInEmptySlot_DT(timeArray_b,timeArray_a[i]);
-         Print("Storing Red " + ema_a[i] + " into " );
+        
          StoreInEmptySlot(Level_d,ema_a[i]);
          StoreInEmptySlot_DT(timeArray_d,timeArray_a[i]);
       }
@@ -128,13 +127,12 @@ void mainProg()
       {
          StoreInEmptySlot(blue_c,ema_a[i]);
          StoreInEmptySlot_DT(timeArray_c,timeArray_a[i]);
-         Print("Storing Blue " + ema_a[i] + " into " );
+        
          StoreInEmptySlot(Level_d,ema_a[i]);
          StoreInEmptySlot_DT(timeArray_d,timeArray_a[i]);
       }
    }
-//  double testArray[12] = {2012.5,2015.75,2020.3,2018.6,2025.45,2025.1,2012.75,2035.2,2040.55,2012.8,2046.7,2046.4};
-    Print("pipthreashold : " , pipThreshold);                        
+                 
     GroundSeeking_Func(Level_d,timeArray_d,Horizontal_e, timeArray_e , pipThreshold );
     
   
@@ -154,10 +152,7 @@ void mainProg()
     bool CandleStick_IsBuy;
     CSPatternType CSPattern_return;
     bool foundPattern = DetectCandlestickPattern(Symbol(), (ENUM_TIMEFRAMES)Period(), 1, Level_d, HighestPriceLevel, LowestPriceLevel, CandleStick_IsBuy,CSPattern_return );
-    if (foundPattern)
-    {
-        Print("Candlestick pattern found. Highest :" ,HighestPriceLevel , "Lowest : ", LowestPriceLevel);
-    }
+
     
    DrawHorizontalLines(Horizontal_e,timeArray_e ,ema_a[ArraySize(ema_a) - 1], ResistanceLevel, SupportLevel);
    if(foundPattern)
