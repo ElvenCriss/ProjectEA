@@ -121,20 +121,21 @@ int CustomTradeExec_Checker(double Support, double Resistance, bool Candlestick_
    Print("Checking Pattern:....");
    if(CSPattern == BullishEngulfing_B) 
    { 
-   
+      return 0;
       double askprice; 
       SymbolInfoDouble(_Symbol, SYMBOL_ASK, askprice);
       double stoploss = CSPattern_Low - 100 *_Point;
-      double takeProfit = CalculateTakeProfitFromPrice(askprice,stoploss , 2, isBuy);
+      double takeProfit = CalculateTakeProfitFromPrice(askprice,stoploss , 1, isBuy);
       customTrade(3, stoploss ,takeProfit, isBuy, CSPattern);
       Print("BullishEngulfing BUY Trade at Price at : ", ask, "S/L : " , stoploss , " T/P : ", Resistance );
    }
    else if(CSPattern == BeareshEngulfing_S)
-   {
+   {  
+      return 0;
       double bidprice; 
       SymbolInfoDouble(_Symbol, SYMBOL_BID, bidprice);
       double stoploss = CSPattern_High + 100 *_Point;
-      double takeProfit = CalculateTakeProfitFromPrice(bidprice,stoploss , 2, isBuy);
+      double takeProfit = CalculateTakeProfitFromPrice(bidprice,stoploss , 1, isBuy);
       customTrade(3, stoploss ,takeProfit, isBuy, CSPattern);
       Print("BearishEngulfing SELL Trade at Price : ", ask, "S/L : " , stoploss , " T/P : ", Support );
    }
@@ -189,4 +190,49 @@ double CalculateTakeProfitFromPrice(double entryPrice, double slPrice, double rr
     }
 
     return tpPrice;
+}
+
+
+
+
+void MoveStopToBreakeven()
+{
+    int totalPositions = PositionsTotal();
+
+    for (int i = 0; i < totalPositions; i++)
+    {
+        ulong ticket = PositionGetTicket(i);
+        if (!PositionSelectByTicket(ticket))
+            continue;
+
+        string symbol = PositionGetString(POSITION_SYMBOL);
+        if (symbol != _Symbol) // only manage trades on current symbol
+            continue;
+
+        double entryPrice = PositionGetDouble(POSITION_PRICE_OPEN);
+        double stopLoss   = PositionGetDouble(POSITION_SL);
+        double volume     = PositionGetDouble(POSITION_VOLUME);
+        double sl_distance = 0.0;
+        double currentPrice = 0.0;
+
+        long type = PositionGetInteger(POSITION_TYPE);
+        if (type == POSITION_TYPE_BUY)
+        {
+            SymbolInfoDouble(_Symbol, SYMBOL_BID, currentPrice);
+            sl_distance = entryPrice - stopLoss;
+            if (currentPrice - entryPrice >= sl_distance && stopLoss < entryPrice)
+            {
+                trade.PositionModify(ticket, entryPrice, PositionGetDouble(POSITION_TP));
+            }
+        }
+        else if (type == POSITION_TYPE_SELL)
+        {
+            SymbolInfoDouble(_Symbol, SYMBOL_ASK, currentPrice);
+            sl_distance = stopLoss - entryPrice;
+            if (entryPrice - currentPrice >= sl_distance && stopLoss > entryPrice)
+            {
+                trade.PositionModify(ticket, entryPrice, PositionGetDouble(POSITION_TP));
+            }
+        }
+    }
 }

@@ -7,7 +7,6 @@
 #property link      "https://www.mql5.com"
 #property version   "1.00"
 #include <Trade\Trade.mqh>
-   CTrade trade;
    
  #include "CustomLog.mq5";
  #include "CustomArrayHandler.mq5";
@@ -24,10 +23,17 @@ datalogType LogTransactionz = LogTransaction;
 
 
 
-
 // Input parameters
 input int pipThreshold; // Threshold in pips to merge peaks/valleys into a single line
 input int  totalBars = 100;
+input int RiskPercentage;
+input int RiskRewardRatio;
+input int CushionStopLoss;
+
+
+input int RiskPercentage_LT;
+input int RiskRewardRation_LT;
+
 datetime lastCandleTime = 0; // Global variable to track the last checked candle
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -159,7 +165,10 @@ void mainProg()
         CustomTradeExec_Checker(SupportLevel,ResistanceLevel,CandleStick_IsBuy,HighestPriceLevel,LowestPriceLevel,CSPattern_return);
    }
    
-   //MoveStopToBreakeven();
+   
+   CleanupClosedTrades();
+   ApplyTrailingStops();  
+   
    DrawArrowLinesDown(blue_c,timeArray_c);
    DrawArrowLinesUp(red_b,timeArray_b);
       
