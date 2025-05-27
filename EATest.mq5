@@ -75,7 +75,7 @@ void OnTick()
       lastCandleTime = currentCandleTime; // Update last candle time
       mainProg();
    }
-
+   mainTickProg();
 }
 
 
@@ -161,8 +161,6 @@ void mainProg()
    }
    
    
-   CleanupClosedTrades();
-   ApplyTrailingStops();  
    
    DrawArrowLinesDown(blue_c,timeArray_c);
    DrawArrowLinesUp(red_b,timeArray_b);
@@ -173,3 +171,8 @@ void mainProg()
 
 
 
+void mainTickProg()
+{
+   CleanupClosedTrades();
+   ApplyTrailingStops();  
+}
