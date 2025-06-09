@@ -86,7 +86,8 @@ void mainProg()
    
    double ema_a[], red_b[], blue_c[], Level_d[], Horizontal_e[], emaTest[];
    datetime timeArray_a[], timeArray_b[],timeArray_c[], timeArray_d[], timeArray_e[];
-
+   TrendCondition trend_array[];
+   
    // Retrieve EMA values
    if(!CopyBuffer(iMA(_Symbol, PERIOD_CURRENT, emaPeriod, 0, MODE_EMA,PRICE_CLOSE), 0, 0, totalBars, ema_a))
    {
@@ -135,6 +136,8 @@ void mainProg()
                  
     GroundSeeking_Func(Level_d,timeArray_d,Horizontal_e, timeArray_e , pipThreshold );
     
+   RemoveHighlighted_Trend();
+   Highlight_Trend(totalBars); 
   
    
    
@@ -152,24 +155,22 @@ void mainProg()
     bool CandleStick_IsBuy;
     CSPatternType CSPattern_return;
     bool foundPattern = DetectCandlestickPattern(Symbol(), (ENUM_TIMEFRAMES)Period(), 1, Level_d, HighestPriceLevel, LowestPriceLevel, CandleStick_IsBuy,CSPattern_return );
-
     
+    TrendCondition CurrentTrend= GetTrendConditionPerBar(0);
    DrawHorizontalLines(Horizontal_e,timeArray_e ,ema_a[ArraySize(ema_a) - 1], ResistanceLevel, SupportLevel);
    if(foundPattern)
    {
-        CustomTradeExec_Checker(SupportLevel,ResistanceLevel,CandleStick_IsBuy,HighestPriceLevel,LowestPriceLevel,CSPattern_return);
+        CustomTradeExec_Checker(SupportLevel,ResistanceLevel,CandleStick_IsBuy,HighestPriceLevel,LowestPriceLevel,CSPattern_return , CurrentTrend);
    }
-   
-   
+   TrendCondition trend = GetTrendCondition(_Symbol,PERIOD_CURRENT);
+   Print("trend : ",convertTrendEnum(trend));
    
    DrawArrowLinesDown(blue_c,timeArray_c);
    DrawArrowLinesUp(red_b,timeArray_b);
       
 
+
 }
-
-
-
 
 void mainTickProg()
 {
