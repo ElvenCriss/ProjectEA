@@ -167,8 +167,9 @@ void mainProg()
    
    DrawArrowLinesDown(blue_c,timeArray_c);
    DrawArrowLinesUp(red_b,timeArray_b);
-      
-
+   
+   CleanupClosedTrades_ShortTermTrades();
+   CloseTradesByTrend(trend);
 
 }
 
